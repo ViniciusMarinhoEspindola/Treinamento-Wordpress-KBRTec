@@ -122,7 +122,7 @@
                         </div>
                     </section>
                 </form>
-            
+                        <a href="./pagseguro">Pagseguro</a>
             </div>
         </div>
       </div>
