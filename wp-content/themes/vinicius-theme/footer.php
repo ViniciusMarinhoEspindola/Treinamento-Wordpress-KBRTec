@@ -175,7 +175,7 @@
 
         // Etapas do form
         $(document).ready(function () {
-            $('form section').eq(1).fadeOut();
+            $('form section').eq(1).hide();
         });
 
         $('#next').click(function (e) {

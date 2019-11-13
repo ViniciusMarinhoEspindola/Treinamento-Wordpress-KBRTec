@@ -2,19 +2,32 @@
 /** Template Name: Pagseguro */
 
 get_header();
-?>
-
-<?php
 //Incluir o arquivo de configuração
 include 'config.php';
+$valor = get_field('valor', $_POST['treinamento_id'])
 ?>
-<div class="container">
+<div class="container">  
     <div class="row">
+        <div id="msg-status"></div>
         <h1 class="col-12 text-warning my-3 text-center">Informações de pagamento</h1>
 
        <span class="endereco" data-endereco="<?php echo URL; ?>"></span>
+       <span class="amount" data-amount="<?php echo $valor; ?>"></span> 
 
        <form name="formPagamento" class="col-6" action="" id="formPagamento">
+            <input type="hidden" value="<?php echo $_POST['nome'] ?>" name="nome">
+            <input type="hidden" value="<?php echo $_POST['nascimento'] ?>" name="nascimento">
+            <input type="hidden" value="<?php echo $_POST['cpf'] ?>" name="cpf">
+            <input type="hidden" value="<?php echo $_POST['email'] ?>" name="email">
+            <input type="hidden" value="<?php echo $_POST['cep'] ?>" name="cep">
+            <input type="hidden" value="<?php echo $_POST['endereco'] ?>" name="endereco">
+            <input type="hidden" value="<?php echo $_POST['bairro'] ?>" name="bairro">
+            <input type="hidden" value="<?php echo $_POST['cidade'] ?>" name="cidade">
+            <input type="hidden" value="<?php echo $_POST['estado'] ?>" name="estado">
+            <input type="hidden" value="<?php echo $_POST['telefone'] ?>" name="telefone">
+            <input type="hidden" value="<?php echo $_POST['celular'] ?>" name="celular">
+            <input type="hidden" value="<?php echo $_POST['treinamento_id'] ?>" name="treinamento_id">
+            
             <div class="form-group">
                 <label for='numCartao'>Número do cartão</label>
                 <input type="text" class="form-control" name="numCartao" id="numCartao">
@@ -56,13 +69,8 @@ include 'config.php';
             </div>
             
             <div class="form-group">
-                <label>Token do cartão</label>
-                <input type="text" class="form-control" name="tokenCartao" id="tokenCartao">
-            </div>
-            
-            <div class="form-group">
-                <label>Identificador com os dados do comprador </label>
-                <input type="text" class="form-control" name="hashCartao" id="hashCartao">
+                <input type="hidden" class="form-control" name="tokenCartao" id="tokenCartao">
+                <input type="hidden" class="form-control" name="hashCartao" id="hashCartao">
             </div>
             
             <div class="form-group">
@@ -79,7 +87,7 @@ include 'config.php';
 <script type="text/javascript" src="<?php echo SCRIPT_PAGSEGURO; ?>"></script>
 
 <script>
-    var amount = "600.00";
+    var amount = $('.amount').attr("data-amount");
     pagamento();
     $('#qtParcelas').hide();
 
@@ -194,18 +202,19 @@ include 'config.php';
                 $("#hashCartao").val(retorno.senderHash);
                 var dados = $("#formPagamento").serialize();
                 $.ajax({
-                    url: "./checkout",
+                    url: "./pagar/checkout/",
                     type:"POST",
                     cache: false,
                     data: dados,
                     success: function(response) {
-                        console.log(response+" sucesso");
+                        console.log(response+" Sucesso");
+                        $('#msg-status').html('<div class="alert alert-success col-12">'+response+'</div>');
                     },
                     error: function(response) {
                         console.log(response+" Erro");
+                        $('#msg-status').html(response);
                     }
                 });
-                //console.log(dados);
             }
         });
     }
