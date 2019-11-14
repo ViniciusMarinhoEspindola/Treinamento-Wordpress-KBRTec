@@ -63,6 +63,8 @@ function pc_remove_submenus() {
   */
   
 /* Criando a pagina de gerenciamento de treinamentos */
+
+
   add_theme_support('post-thumbnails');
 
   function pc_create_post_treinamento()
@@ -124,10 +126,9 @@ function pc_remove_submenus() {
   }
 
   // Cadastrar os inscritos
-  function cadastrar_inscritos()
+  function cadastrar_inscritos($pagamento = '')
   {
     global $wpdb;
-    wp_mail( [$_POST['email']], "Inscrição Confirmada com sucesso!", "Sua inscrição no treinamento foi realizada com sucesso!" );
     $wpdb->insert( 
         'usuarios_wp', 
         array( 
@@ -136,14 +137,15 @@ function pc_remove_submenus() {
             'cpf' => $_POST['cpf'], 
             'email' => $_POST['email'],
             'cep' => $_POST['cep'], 
-            'endereco' => $_POST['endereco'],
+            'endereco' => $_POST['endereco'].', Número '.$_POST['numero'].', complemento '.$_POST['complemento'],
             'bairro' => $_POST['bairro'], 
             'cidade' => $_POST['cidade'],
             'estado' => $_POST['estado'], 
             'telefone' => $_POST['telefone'],
             'celular' => $_POST['celular'], 
             'treinamento_id' => $_POST['treinamento_id'],
-            'dt_inscricao' => date("Y-m-d") 
+            'dt_inscricao' => date("Y-m-d") ,
+            'cd_pagamento' => $pagamento
         )
     );
 
@@ -157,4 +159,35 @@ function pc_remove_submenus() {
     $wpdb->delete( 'usuarios_wp', array( 'id_usuario' => $_POST['usuario'] ) );
 
     echo "Deletado com sucesso!";
+  }
+
+  function wordpress_pagination($items = null)
+  {
+    $prev_arrow = is_rtl() ? '→' : '←';
+    $next_arrow = is_rtl() ? '←' : '→';
+    global $wp_query;
+    if ($items) {
+        $total = $items->max_num_pages;
+    } else {
+        $total = $wp_query->max_num_pages;
+    }
+    $big = 999999999; // need an unlikely integer
+    if ($total >= 1) {
+        if (!$current_page = get_query_var('paged'))
+            $current_page = 1;
+        if (get_option('permalink_structure')) {
+            $format = 'page/%#%/';
+        } else {
+            $format = '&paged=%#%';
+        }
+        echo paginate_links(array(
+            'base'            => str_replace($big, '%#%', esc_url(get_pagenum_link($big))),
+            'format'        => $format,
+            'current'        => max(1, get_query_var('paged')),
+            'total'         => $total,
+            'type'             => 'list',
+            'prev_text'        => $prev_arrow,
+            'next_text'        => $next_arrow,
+        ));
+    }
   }

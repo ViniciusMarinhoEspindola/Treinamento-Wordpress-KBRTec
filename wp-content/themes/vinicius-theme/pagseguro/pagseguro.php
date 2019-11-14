@@ -8,7 +8,7 @@ $valor = get_field('valor', $_POST['treinamento_id'])
 ?>
 <div class="container">  
     <div class="row">
-        <div id="msg-status"></div>
+        <div id="msg-status" class="col-12"></div>
         <h1 class="col-12 text-warning my-3 text-center">Informações de pagamento</h1>
 
        <span class="endereco" data-endereco="<?php echo URL; ?>"></span>
@@ -21,6 +21,8 @@ $valor = get_field('valor', $_POST['treinamento_id'])
             <input type="hidden" value="<?php echo $_POST['email'] ?>" name="email">
             <input type="hidden" value="<?php echo $_POST['cep'] ?>" name="cep">
             <input type="hidden" value="<?php echo $_POST['endereco'] ?>" name="endereco">
+            <input type="hidden" value="<?php echo $_POST['numero'] ?>" name="numero">
+            <input type="hidden" value="<?php echo $_POST['complemento'] ?>" name="complemento">
             <input type="hidden" value="<?php echo $_POST['bairro'] ?>" name="bairro">
             <input type="hidden" value="<?php echo $_POST['cidade'] ?>" name="cidade">
             <input type="hidden" value="<?php echo $_POST['estado'] ?>" name="estado">
@@ -206,13 +208,23 @@ $valor = get_field('valor', $_POST['treinamento_id'])
                     type:"POST",
                     cache: false,
                     data: dados,
+                    beforeSend : function(){
+                        $("#btnComprar").val("ENVIANDO...");
+                        $("#btnComprar").attr("disabled", true);
+                        setTimeout($('html, body').animate({scrollTop:0}, 'slow'), 3000); //slow, medium, fast
+                    },
                     success: function(response) {
                         console.log(response+" Sucesso");
-                        $('#msg-status').html('<div class="alert alert-success col-12">'+response+'</div>');
+                        $('#msg-status').html('<div class="alert alert-success col-12">Inscrição Recebida</div>');
                     },
                     error: function(response) {
                         console.log(response+" Erro");
-                        $('#msg-status').html(response);
+                        $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Inscrição</div>');
+                    },
+                    complete: function() {
+                        $("#btnComprar").val("Enviado");
+                        $("#btnComprar").attr("disabled", false);
+                        //window.setTimeout("location.href='./'",1000);
                     }
                 });
             }

@@ -117,6 +117,9 @@
                     endereco:{
                         required: true
                     },
+                    numero:{
+                        required: true
+                    },
                     bairro:{
                         required: true
                     },
@@ -157,6 +160,9 @@
                         required:"*Este campo é obrigatório!"
                     },
                     endereco:{
+                        required:"*Este campo é obrigatório!"
+                    },
+                    numero:{
                         required:"*Este campo é obrigatório!"
                     },
                     bairro:{

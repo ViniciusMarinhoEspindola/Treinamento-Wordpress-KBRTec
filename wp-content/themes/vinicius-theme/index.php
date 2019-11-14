@@ -1,11 +1,13 @@
 <?php get_header(); ?>
 
 <?php
+    $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
     $args = array(
-        'post_type' => 'treinamento'
+        'post_type' => 'treinamento',
+        'paged' => $paged
     ); 
     $items = new WP_Query($args);
-    
+   
 ?>
 
 <h1 class="text-center display-4 text-warning mb-5">Treinamentos</h1>
@@ -53,6 +55,9 @@
                 </a>
             </div>
         <?php endwhile; ?>
+
+        <?php echo get_next_posts_link( 'Próximo', $items->max_num_pages ); ?>
+        <?php echo get_previous_posts_link( 'Anterior', $items->max_num_pages ); ?>
         <?php else: ?>
             <h1 class="text-muted">Não há treinamentos disponíveis</h1>
         <?php endif; ?>

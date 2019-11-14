@@ -29,17 +29,19 @@ $data["creditCardHolderName"]=$_POST['nome'];
 $data["creditCardHolderCPF"]= str_replace(['.','-'], "", $_POST['cpf']);
 $data["creditCardHolderBirthDate"]= date('d/m/Y', strtotime($_POST['nascimento']));
 $data["creditCardHolderAreaCode"]= substr($_POST['telefone'], 1, 2);
-$data["creditCardHolderPhone"]= str_replace('-', "", substr($_POST['telefone'], 5));;
+$data["creditCardHolderPhone"]= str_replace('-', "", substr($_POST['telefone'], 5));
 $data["billingAddressStreet"]=$_POST['endereco'];
-$data["billingAddressNumber"]= str_replace(['.','-', ' ', 'o'], "", substr($_POST['endereco'], -4));
-$data["billingAddressComplement"]='';
+$data["billingAddressNumber"]= $_POST['numero'];
+$data["billingAddressComplement"]= isset($_POST['complemento']) ? $_POST['complemento'] : '';
 $data["billingAddressDistrict"]=$_POST['bairro'];
 $data["billingAddressPostalCode"]=$_POST['cep'];
 $data["billingAddressCity"]=$_POST['cidade'];
 $data["billingAddressState"]=$_POST['estado'];
 $data["billingAddressCountry"]="BRA";
+$data["notificationURL"] = "http://localhost/wordpress-crud/";
+//
+wp_mail( [$_POST['email']], "Inscrição Recebida!", "Sua inscrição no treinamento foi recebida, assim que o pagamento for feito sua inscrição será efetivada!" );
 
-cadastrar_inscritos();
 $url = 'https://ws.sandbox.pagseguro.uol.com.br/v2/transactions';
 
 $curl = curl_init($url);
@@ -54,5 +56,5 @@ $xml = curl_exec($curl);
 curl_close($curl);
 
 $xml = simplexml_load_string($xml);
-
-//var_dump($xml);
+cadastrar_inscritos($xml->code);
+echo $xml->code;

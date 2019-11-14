@@ -7,6 +7,7 @@
 
     if(isset($_POST) && $_POST)
     {
+        wp_mail( [$_POST['email']], "Inscrição Confirmada com sucesso!", "Sua inscrição no treinamento foi realizada com sucesso!" );
 ?>
         <div class="alert alert-success"><?php cadastrar_inscritos(); ?></div>
 <?php     
@@ -106,9 +107,19 @@
                             <label for="cep">CEP</label>
                             <input type="text" class="form-control" id="cep" placeholder="11111-111" name="cep">
                         </div>
+                        <div class="form-row">
+                            <div class="form-group col-9">
+                                <label for="endereco">Endereço</label>
+                                <input type="text" class="form-control" id="endereco" placeholder="Av. Exemplo Exemplo Exemplo, Número 1111" name="endereco">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="numero">Número</label>
+                                <input type="number" class="form-control" id="numero" placeholder="1111" name="numero">
+                            </div>
+                        </div>
                         <div class="form-group">
-                            <label for="endereco">Endereço</label>
-                            <input type="text" class="form-control" id="endereco" placeholder="Av. Exemplo Exemplo Exemplo, Número 1111" name="endereco">
+                            <label for="complemento">Complemento</label>
+                            <input type="text" class="form-control" id="complemento" placeholder="Casa 12" name="complemento">
                         </div>
                         <div class="form-group">
                             <label for="bairro">Bairro</label>
