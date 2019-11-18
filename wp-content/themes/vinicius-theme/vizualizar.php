@@ -49,6 +49,7 @@
                     <th>Cidade</th>
                     <th>Estado</th>
                     <th>data de inscrição</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,6 +64,7 @@
                             <td><?php echo $inscrito->cidade; ?></td>
                             <td><?php echo $inscrito->estado; ?></td>
                             <td><?php echo date('d/m/Y', strtotime($inscrito->dt_inscricao)); ?></td>
+                            <td><?php echo $inscrito->status_pagamento; ?></td>
                         </tr>
                 <?php
                     } 

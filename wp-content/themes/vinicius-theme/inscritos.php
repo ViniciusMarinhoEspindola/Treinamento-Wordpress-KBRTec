@@ -112,7 +112,7 @@
 <?php
     }
     global $wpdb; 
-    $inscritos = $wpdb->get_results("SELECT id_usuario,post_title, dt_inscricao, nome, email FROM usuarios_wp u INNER JOIN wp_posts p ON u.treinamento_id = p.ID".$where." ORDER BY id_usuario DESC"); 
+    $inscritos = $wpdb->get_results("SELECT id_usuario,post_title, dt_inscricao, nome, email, status_pagamento FROM usuarios_wp u INNER JOIN wp_posts p ON u.treinamento_id = p.ID".$where." ORDER BY id_usuario DESC"); 
 ?>
 
 
@@ -124,6 +124,7 @@
                 <th>Data de inscrição</th>
                 <th>Nome</th>
                 <th>E-mail</th>
+                <th>Status</th>
                 <th>Vizualizar</th>
                 <th>Excluir</th>
             </tr>
@@ -137,6 +138,7 @@
             <td><?php echo date('d/m/Y', strtotime($inscrito->dt_inscricao)); ?></td>
             <td><?php echo $inscrito->nome; ?></td>
             <td><?php echo $inscrito->email; ?></td>
+            <td><?php echo $inscrito->status_pagamento; ?></td>
             <td><button value="<?php echo $inscrito->id_usuario; ?>" class="vizualizar">Vizualizar</button></td>
             <form action="#" method="POST">
                 <input type="hidden" value="<?php echo $inscrito->id_usuario; ?>" id="id_inscrito" name="usuario">
