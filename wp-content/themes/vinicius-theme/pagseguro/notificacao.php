@@ -1,6 +1,11 @@
 <?php
 /** Template Name: Notification */
+header("access-control-allow-origin: https://sandbox.pagseguro.uol.com.br");
 
+if(!isset($_POST['notificationCode']) || $_POST['notificationCode'] === ''){
+    header('Location: ../');
+    exit;
+}
 
 $notificationCode = preg_replace('/[^[:alnum:]-]/','',$_POST["notificationCode"]);
 
@@ -19,18 +24,35 @@ curl_close($curl);
 
 $xml = simplexml_load_string($xml);
 
-$reference = $xml->reference;
+$codigo = $xml->code;
 $status = $xml->status;
 
-/* Conectar com o banco e mudar o status
-if($reference && $status){
- include_once 'conecta.php';
- $conn = new conecta();
-
- $rs_pedido = $conn->consultarPedido($reference);
-
- if($rs_pedido){
- $conn->atualizaPedido($reference,$status);
- }
+switch($status) {
+    case 1:
+        $status = 'Aguardando pagamento';
+        break;
+    case 2:
+        $status = 'Em análise';
+        break;
+    case 3:
+        $status = 'Paga';
+        break;
+    case 4:
+        $status = 'Disponível';
+        break;
+    case 5:
+        $status = 'Em disputa';
+        break;
+    case 6:
+        $status = 'Devolvida';
+        break;
+    case 7:
+        $status = 'Cancelada';
+        break;
 }
-*/
+
+//var_dump($xml);
+global $wpdb; 
+$inscrito = $wpdb->get_row("SELECT * FROM usuarios_wp WHERE cd_pagamento = '".$codigo."'");
+$wpdb->update( 'usuarios_wp', ['status_pagamento' => $status], ['cd_pagamento' => $codigo]);
+wp_mail( [$inscrito->email], "Pagamento Recebido!", "Olá ".$inscrito->nome.", recebemos seu pagamento e sua inscrição foi efetivada com sucesso!");

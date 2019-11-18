@@ -38,7 +38,7 @@ $data["billingAddressPostalCode"]=$_POST['cep'];
 $data["billingAddressCity"]=$_POST['cidade'];
 $data["billingAddressState"]=$_POST['estado'];
 $data["billingAddressCountry"]="BRA";
-$data["notificationURL"] = "http://localhost/wordpress-crud/notificacoes/";
+$data["notificationURL"] = "https://localhost/wordpress-crud/notificacoes/";
 //
 wp_mail( [$_POST['email']], "Inscrição Recebida!", "Sua inscrição no treinamento foi recebida, assim que o pagamento for feito sua inscrição será efetivada!" );
 
@@ -56,5 +56,5 @@ $xml = curl_exec($curl);
 curl_close($curl);
 
 $xml = simplexml_load_string($xml);
-cadastrar_inscritos($xml->code);
-echo $xml->code;
+cadastrar_inscritos($xml->code, 'Aguardando pagamento');
+//var_dump($xml);

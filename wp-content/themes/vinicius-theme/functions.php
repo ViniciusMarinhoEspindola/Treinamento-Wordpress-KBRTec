@@ -1,5 +1,4 @@
-<?php
-/* 
+<?php 
 // -------------------------------------------------
 // - REMOVER itens do menu de navegação à esquerda -
 // -------------------------------------------------
@@ -60,7 +59,7 @@ function pc_remove_submenus() {
    
   add_action('admin_init', 'pc_remove_plugin_editor');
   
-  */
+
   
 /* Criando a pagina de gerenciamento de treinamentos */
 
@@ -126,7 +125,7 @@ function pc_remove_submenus() {
   }
 
   // Cadastrar os inscritos
-  function cadastrar_inscritos($pagamento = '')
+  function cadastrar_inscritos($pagamento = '', $status = '')
   {
     global $wpdb;
     $wpdb->insert( 
@@ -145,7 +144,8 @@ function pc_remove_submenus() {
             'celular' => $_POST['celular'], 
             'treinamento_id' => $_POST['treinamento_id'],
             'dt_inscricao' => date("Y-m-d") ,
-            'cd_pagamento' => $pagamento
+            'cd_pagamento' => $pagamento,
+            'status_pagamento' => $status
         )
     );
 
@@ -190,4 +190,32 @@ function pc_remove_submenus() {
             'next_text'        => $next_arrow,
         ));
     }
+  }
+
+
+  function unique_value($campo) {
+      global $wpdb;
+      $results = $wpdb->get_results("SELECT * FROM usuarios_wp WHERE $campo = '".$_POST[$campo]."' AND treinamento_id = '".$_POST['treinamento_id']."'");
+      if($wpdb->num_rows !== 0){
+        return False;
+      }
+      return True;
+  }
+
+  function preenche_form() {
+    return array( 
+      'nome' => (isset($_POST['nome'])) ? $_POST['nome'] : '', 
+      'nascimento' => (isset($_POST['nascimento'])) ? $_POST['nascimento'] : '',
+      'cpf' => (isset($_POST['cpf'])) ? $_POST['cpf'] : '', 
+      'email' => (isset($_POST['email'])) ? $_POST['email'] : '',
+      'cep' => (isset($_POST['cep'])) ? $_POST['cep'] : '', 
+      'endereco' => (isset($_POST['endereco'])) ? $_POST['endereco'] : '',
+      'numero' => (isset($_POST['numero'])) ? $_POST['numero'] : '',
+      'complemento' => (isset($_POST['complemento'])) ? $_POST['complemento'] : '',
+      'bairro' => (isset($_POST['bairro'])) ? $_POST['bairro'] : '', 
+      'cidade' =>(isset($_POST['cidade'])) ? $_POST['cidade'] : '',
+      'estado' => (isset($_POST['estado'])) ? $_POST['estado'] : '', 
+      'telefone' => (isset($_POST['telefone'])) ? $_POST['telefone'] : '',
+      'celular' => (isset($_POST['celular'])) ? $_POST['celular'] : '', 
+    );
   }

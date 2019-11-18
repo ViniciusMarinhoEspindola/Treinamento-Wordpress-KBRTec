@@ -4,7 +4,25 @@
 get_header();
 //Incluir o arquivo de configuração
 include 'config.php';
-$valor = get_field('valor', $_POST['treinamento_id'])
+$valor = get_field('valor', $_POST['treinamento_id']);
+
+
+if(!unique_value('email')) {
+?>
+    <div class="alert alert-danger">Esse E-mail já está cadastrado neste treinamento</div>
+    <script>
+        var cadastrado = true;
+    </script>
+<?php
+}
+if(!unique_value('cpf')) {
+?>
+    <div class="alert alert-danger">Esse CPF já está cadastrado neste treinamento</div>
+    <script>
+        var cadastrado = true;
+    </script>
+<?php
+}
 ?>
 <div class="container">  
     <div class="row">
@@ -88,7 +106,49 @@ $valor = get_field('valor', $_POST['treinamento_id'])
 
 <script type="text/javascript" src="<?php echo SCRIPT_PAGSEGURO; ?>"></script>
 
-<script>
+<script> 
+    // validate
+    $(document).ready(function(){
+        $("#formPagamento").validate({
+            rules:{
+                numCartao:{
+                    required:true,
+                    creditcard: true
+                },
+                cvvCartao:{
+                    required:true
+                },
+                mesValidade:{
+                    required:true
+                },
+                anoValidade:{
+                    required:true
+                },
+                qntParcelas:{
+                    required:true
+                }
+            },
+            messages:{
+                numCartao:{
+                    required:"*Este campo é obrigatório!",
+                    creditcard:"*Digite um número de cartão válido!"
+                },
+                cvvCartao:{
+                    required:"*Este campo é obrigatório!"
+                },
+                mesValidade:{
+                    required:"*Este campo é obrigatório!"
+                },
+                anoValidade:{
+                    required:"*Este campo é obrigatório!"
+                },
+                qntParcelas:{
+                    required:"*Este campo é obrigatório!"
+                }
+            }
+        });
+    });
+
     var amount = $('.amount').attr("data-amount");
     pagamento();
     $('#qtParcelas').hide();
@@ -212,6 +272,7 @@ $valor = get_field('valor', $_POST['treinamento_id'])
                         $("#btnComprar").val("ENVIANDO...");
                         $("#btnComprar").attr("disabled", true);
                         setTimeout($('html, body').animate({scrollTop:0}, 'slow'), 3000); //slow, medium, fast
+                        $('#msg-status').html('<div class="alert alert-info col-12">Recebendo inscrição...</div>');
                     },
                     success: function(response) {
                         console.log(response+" Sucesso");
@@ -224,10 +285,14 @@ $valor = get_field('valor', $_POST['treinamento_id'])
                     complete: function() {
                         $("#btnComprar").val("Enviado");
                         $("#btnComprar").attr("disabled", false);
-                        //window.setTimeout("location.href='./'",1000);
+                        window.setTimeout("location.href='./'",1000);
                     }
                 });
             }
         });
+    }
+
+    if (cadastrado) {
+        $('form input').attr("disabled", true);
     }
 </script>
