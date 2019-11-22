@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
 <style>
     .my-table {
         border-top: 2px solid #f0ad4e;
@@ -65,9 +66,9 @@
     }
 
     .my-table button:hover {
-        color: #fff;
-        background-color: #e0a800;
-        border-color: #d39e00;
+        color: #f0ad4e;
+        background-color: #fff;
+        border-color: #f0ad4e;
     }
 
     .my-table button:focus, .my-table button.focus {
@@ -79,8 +80,8 @@
     .my-table td{
         text-align: center;
     }
-    center {
-       margin-top: 100px;
+    .pag {
+       margin-top: 70px;
 
     }
     .alert {
@@ -99,6 +100,7 @@
 </style>
 
 <?php
+    datable_style();
     if(isset($_GET['id']))
         $where = ' WHERE p.ID = '.$_GET['id'];
     else
@@ -112,12 +114,14 @@
 <?php
     }
     global $wpdb; 
-    $inscritos = $wpdb->get_results("SELECT id_usuario,post_title, dt_inscricao, nome, email, status_pagamento FROM usuarios_wp u INNER JOIN wp_posts p ON u.treinamento_id = p.ID".$where." ORDER BY id_usuario DESC"); 
+    //$inscritos = $wpdb->get_results("SELECT id_usuario,post_title, dt_inscricao, nome, email, status_pagamento FROM usuarios_wp u INNER JOIN wp_posts p ON u.treinamento_id = p.ID".$where." ORDER BY id_usuario DESC"); 
+    $inscritos = $wpdb->get_results("SELECT id_usuario, dt_inscricao, nome, email, status_pagamento, treinamento_id FROM usuarios_wp u ".$where." ORDER BY id_usuario DESC"); 
 ?>
+<h1 class="text-warning">Inscritos</h1>
+<center>
+<div class="pag" id="pag">
 
-
-<center id="pag">
-    <table class="my-table" id="table">
+    <table class="my-table table" id="table" style="width:100%">
         <thead>
             <tr>
                 <th>Curso</th>
@@ -134,27 +138,27 @@
     {
 ?>
         <tr>
-            <td><?php echo $inscrito->post_title; ?></td>
+            <td><?php echo get_the_title($inscrito->treinamento_id); ?><?php //echo $inscrito->post_title; ?></td>
             <td><?php echo date('d/m/Y', strtotime($inscrito->dt_inscricao)); ?></td>
             <td><?php echo $inscrito->nome; ?></td>
             <td><?php echo $inscrito->email; ?></td>
             <td><?php echo $inscrito->status_pagamento; ?></td>
-            <td><button value="<?php echo $inscrito->id_usuario; ?>" class="vizualizar">Vizualizar</button></td>
+            <td><button value="<?php echo $inscrito->id_usuario; ?>" class="vizualizar"><i class="fas fa-eye"></i></button></td>
             <form action="#" method="POST">
                 <input type="hidden" value="<?php echo $inscrito->id_usuario; ?>" id="id_inscrito" name="usuario">
-                <td><button type="submit">Excluir</button></td>
+                <td><button type="submit"><i class="fas fa-minus-circle"></i></button></td>
             </form>
         </tr>
 <?php
     } 
 ?>
     </table>
+</div>
 </center>
 
 
-
 <?php get_footer(); ?>
-<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.20/datatables.min.js"></script>
 <script>
     // DataTable
     $(document).ready(function () {
@@ -162,9 +166,10 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
             },
-            "order": [[0, 'desc']],
-            "lengthMenu": [[5, 10], [5, 10]],
-            
+            "order": [],
+            //"lengthMenu": [[5, 10], [5, 10]],
+            "lengthChange": false,
+            "pageLength": 5
         });
     });
 

@@ -26,9 +26,11 @@
         }
     }
 ?>
+<a class="btn btn-warning text-light mx-3" href="<?php echo site_url(); ?>">Voltar</a>
 <h1 class="text-center display-4 text-warning mb-5">Descrição do treinamento</h1>
 
 <div class="container">
+    
     <div class="row">
         <?php if ( $items->have_posts() ) { ?>
         <?php the_post(); ?>
@@ -82,7 +84,7 @@
       <div class="modal-body">
       <div class="container">
         <div class="row">
-            <h1 class="text-center text-warning display-4 col-12">Cadastrar-se no treinamento: <br> <?php echo $post->post_title; ?></h1>
+            <h1 class="text-center text-warning col-12">Cadastrar-se no treinamento: <br> <?php echo $post->post_title; ?></h1>
                 
                 <div class='col-2'></div>
 

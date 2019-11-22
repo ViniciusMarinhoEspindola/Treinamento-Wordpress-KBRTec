@@ -1,4 +1,5 @@
 <?php 
+/*
 // -------------------------------------------------
 // - REMOVER itens do menu de navegação à esquerda -
 // -------------------------------------------------
@@ -59,8 +60,25 @@ function pc_remove_submenus() {
    
   add_action('admin_init', 'pc_remove_plugin_editor');
   
-
-  
+*/
+function update_adminbar($wp_adminbar)
+{
+    // remove unnecessary items
+    $wp_adminbar->remove_node('wp-logo');
+    $wp_adminbar->remove_node('customize');
+    $wp_adminbar->remove_node('updates');
+    $wp_adminbar->remove_node('comments');
+    $wp_adminbar->remove_node('dashboard');
+    $wp_adminbar->remove_node('themes');
+    $wp_adminbar->remove_node('menus');
+    $wp_adminbar->remove_node('new-post');
+    $wp_adminbar->remove_node('new-media');
+    $wp_adminbar->remove_node('new-page');
+    $wp_adminbar->remove_node('new-user');
+}
+// admin_bar_menu hook
+add_action('admin_bar_menu', 'update_adminbar', 999);
+add_filter('pre_site_transient_update_core', create_function('$a', "return null;"));
 /* Criando a pagina de gerenciamento de treinamentos */
 
 
@@ -112,17 +130,39 @@ function pc_remove_submenus() {
   add_filter('manage_posts_columns', 'posts_columns');
   add_action('manage_posts_custom_column', 'posts_custom_columns', 5, 2);
 
-  function posts_columns($defaults){
-    $defaults['vizualizar_user'] = __('Vizualizar');
+  function posts_columns($defaults)
+  {
+    $defaults = array(
+        'cb' => '&lt;input type="checkbox">',
+        'title' => __('Treinamentos'),
+        'vizualizar_user' => __('Vizualizar'),
+        'date' => __('Date')
+    );
     return $defaults;
   }
      
   function posts_custom_columns($column_name, $id){
     if($column_name === 'vizualizar_user'){
       
-      echo "<button style='padding: 0.375rem 0.75rem;border-radius: 0.25rem;font-size: 1rem;color: #fff !important;background-color: #f0ad4e;border-color: #f0ad4e;border: 1px solid transparent;text-decoration: none;'><a href='./admin.php?page=treinamentos&id=".$id."' >Vizualizar</a></button>";
+      echo "<a href='./admin.php?page=treinamentos&id=".$id."' >Vizualizar</a>";
     }
   }
+
+  function datable_style()
+  {
+      wp_enqueue_style('style-name', 'https://cdn.datatables.net/v/bs4-4.1.1/dt-1.10.20/datatables.min.css');
+  }
+
+  function max_title_length($title)
+  {
+      $max = 40;
+      if (strlen($title) > $max) {
+          return mb_substr($title, 0, $max) . " &hellip;";
+      } else {
+          return $title;
+      }
+  }
+  add_filter( 'the_title', 'max_title_length');
 
   // Cadastrar os inscritos
   function cadastrar_inscritos($pagamento = '', $status = '')

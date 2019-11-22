@@ -1,3 +1,6 @@
+<script>
+	var cadastrado = false;
+</script>
 <?php
 /** Template Name: Pagseguro */
 
@@ -6,12 +9,20 @@ get_header();
 include 'config.php';
 $valor = get_field('valor', $_POST['treinamento_id']);
 
+if(!isset($_POST['nome'])){
+?>
+    <div class="alert alert-danger">Cadastre-se primeiro em algum treinamento antes de tentar pagar</div>
+    <script>
+        cadastrado = true;
+    </script>
+<?php
+}
 
 if(!unique_value('email')) {
 ?>
     <div class="alert alert-danger">Esse E-mail já está cadastrado neste treinamento</div>
     <script>
-        var cadastrado = true;
+        cadastrado = true;
     </script>
 <?php
 }
@@ -19,7 +30,7 @@ if(!unique_value('cpf')) {
 ?>
     <div class="alert alert-danger">Esse CPF já está cadastrado neste treinamento</div>
     <script>
-        var cadastrado = true;
+        cadastrado = true;
     </script>
 <?php
 }
@@ -50,7 +61,7 @@ if(!unique_value('cpf')) {
             
             <div class="form-group">
                 <label for='numCartao'>Número do cartão</label>
-                <input type="text" class="form-control" name="numCartao" id="numCartao">
+                <input type="text" class="form-control" name="numCartao" maxlength="16" id="numCartao">
                 
                 <span id="msg"></span>
                 <div class="bandeira-cartao"></div>
@@ -109,6 +120,15 @@ if(!unique_value('cpf')) {
 <script> 
     // validate
     $(document).ready(function(){
+        $.ajax({
+            url: "https://ws.sandbox.pagseguro.uol.com.br/sessions?email=vm_espindola@hotmail.com&token=27797FEBE7804E098D2A1EB3525F67A9",
+            method: 'post',
+            success: function(response)
+            {
+                console.log(response);
+            }
+        })
+        var cadastrado = false;
         $("#formPagamento").validate({
             rules:{
                 numCartao:{
@@ -149,6 +169,7 @@ if(!unique_value('cpf')) {
         });
     });
 
+    var successSend = true;
     var amount = $('.amount').attr("data-amount");
     pagamento();
     $('#qtParcelas').hide();
@@ -161,6 +182,7 @@ if(!unique_value('cpf')) {
             dataType: 'json',
             success: function (retorno) {
                 PagSeguroDirectPayment.setSessionId(retorno.id);
+                console.log(retorno);
             },
             error: function (retorno) {
                 console.log(retorno);
@@ -179,7 +201,10 @@ if(!unique_value('cpf')) {
                 $.each(retorno.paymentMethods.CREDIT_CARD.options, function (i, obj) {
                     $('.meio-pag').append("<span class='img-band p-3'><img src='https://stc.pagseguro.uol.com.br" + obj.images.SMALL.path + "'></span>");
                 });
-            }
+            },
+            error: function(){
+                $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Informações de pagamento</div>');
+            },
         });
     }
 
@@ -227,6 +252,9 @@ if(!unique_value('cpf')) {
                         $('#qntParcelas').append("<option value='" + objb.quantity + "' data-parcelas='" + objb.installmentAmount + "'>" + objb.quantity + " parcelas de R$ " + valorParcela + "</option>");
                     });
                 });
+            },
+            error: function(){
+                $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Inscrição</div>');
             }
         });
     }
@@ -234,11 +262,13 @@ if(!unique_value('cpf')) {
     $('#qntParcelas').change(function () {
         $('#valorParcelas').val($('#qntParcelas').find(':selected').attr('data-parcelas'));
     });
+    
 
     //Recuperar o token do cartão de crédito
     $("#formPagamento").on("submit", function (event) {
         event.preventDefault();
-
+        // $("#btnComprar").val("ENVIANDO...");
+        // $("#btnComprar").attr("disabled", true);    
         PagSeguroDirectPayment.createCardToken({
             cardNumber: $('#numCartao').val(), // Número do cartão de crédito
             brand: $('#bandeiraCartao').val(), // Bandeira do cartão
@@ -247,6 +277,12 @@ if(!unique_value('cpf')) {
             expirationYear: $('#anoValidade').val(), // Ano da expiração do cartão, é necessário os 4 dígitos.
             success: function (retorno) {
                 $('#tokenCartao').val(retorno.card.token);
+                successSend = true;
+            },
+            error: function(){
+                $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Inscrição</div>');
+                successSend = false;
+                return false;
             },
             complete: function (retorno) {
                 recupHashCartao();
@@ -263,31 +299,42 @@ if(!unique_value('cpf')) {
             } else {
                 $("#hashCartao").val(retorno.senderHash);
                 var dados = $("#formPagamento").serialize();
-                $.ajax({
-                    url: "./pagar/checkout/",
-                    type:"POST",
-                    cache: false,
-                    data: dados,
-                    beforeSend : function(){
-                        $("#btnComprar").val("ENVIANDO...");
-                        $("#btnComprar").attr("disabled", true);
-                        setTimeout($('html, body').animate({scrollTop:0}, 'slow'), 3000); //slow, medium, fast
-                        $('#msg-status').html('<div class="alert alert-info col-12">Recebendo inscrição...</div>');
-                    },
-                    success: function(response) {
-                        console.log(response+" Sucesso");
-                        $('#msg-status').html('<div class="alert alert-success col-12">Inscrição Recebida</div>');
-                    },
-                    error: function(response) {
-                        console.log(response+" Erro");
-                        $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Inscrição</div>');
-                    },
-                    complete: function() {
-                        $("#btnComprar").val("Enviado");
-                        $("#btnComprar").attr("disabled", false);
-                        window.setTimeout("location.href='./'",1000);
-                    }
-                });
+                if(successSend) {
+                    $.ajax({
+                        url: "./pagar/checkout/",
+                        type:"POST",
+                        cache: false,
+                        data: dados,
+                        //dataType: "json",
+                        beforeSend : function(){
+                            $("#btnComprar").val("ENVIANDO...");
+                            $("#btnComprar").attr("disabled", true);
+                            //setTimeout($('html, body').animate({scrollTop:0}, 'slow'), 3000); //slow, medium, fast
+                            $('#msg-status').html('<div class="alert alert-info col-12">Recebendo inscrição...</div>');
+                        },
+                        success: function(response) {
+                            if(response == "ERRO"){
+                                $('#msg-status').html('<div class="alert alert-danger col-12">Domínio de e-mail inválido para efetuar a transação</div>');
+                                successSend = false;
+                                return false;    
+                            } else {
+                                console.log(response);
+                                $('#msg-status').html('<div class="alert alert-success col-12">Inscrição Recebida</div>');
+                                window.setTimeout("location.href='./'",1000);
+                            }
+                        },
+                        error: function(response) {
+                            console.log(response);
+                            $('#msg-status').html('<div class="alert alert-danger col-12">Falha ao receber Inscrição</div>');
+                        },
+                        complete: function() {
+                            $("#btnComprar").val("Enviado");
+                            $("#btnComprar").attr("disabled", false);
+                            
+                        }
+                    });
+                }
+                successSend = true;
             }
         });
     }

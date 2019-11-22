@@ -40,7 +40,6 @@ $data["billingAddressState"]=$_POST['estado'];
 $data["billingAddressCountry"]="BRA";
 $data["notificationURL"] = "https://localhost/wordpress-crud/notificacoes/";
 //
-wp_mail( [$_POST['email']], "Inscrição Recebida!", "Sua inscrição no treinamento foi recebida, assim que o pagamento for feito sua inscrição será efetivada!" );
 
 $url = 'https://ws.sandbox.pagseguro.uol.com.br/v2/transactions';
 
@@ -56,5 +55,10 @@ $xml = curl_exec($curl);
 curl_close($curl);
 
 $xml = simplexml_load_string($xml);
-cadastrar_inscritos($xml->code, 'Aguardando pagamento');
-//var_dump($xml);
+if(isset($xml->error)) {
+    echo "ERRO"; 
+} else {
+    wp_mail( [$_POST['email']], "Inscrição Recebida!", "Sua inscrição no treinamento foi recebida, assim que o pagamento for feito sua inscrição será efetivada!" );
+    cadastrar_inscritos($xml->code, 'Aguardando pagamento');
+    echo json_encode($xml);
+}
